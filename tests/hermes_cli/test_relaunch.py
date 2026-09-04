@@ -97,6 +97,25 @@ class TestBuildRelaunchArgv:
         assert "--tui" not in argv
         assert argv == ["/usr/bin/hermes", "--resume", "abc"]
 
+    def test_python_script_launcher_reuses_current_interpreter(self, monkeypatch, tmp_path):
+        # install.sh's shim runs <checkout>/hermes with the venv python, so
+        # argv[0] is that script. Exec'ing it directly would let its
+        # ``#!/usr/bin/env python3`` shebang pick the system interpreter.
+        script = tmp_path / "hermes"
+        script.write_text("#!/usr/bin/env python3\n")
+        script.chmod(0o755)
+        monkeypatch.setattr(relaunch_mod, "resolve_hermes_bin", lambda: str(script))
+        argv = relaunch_mod.build_relaunch_argv(["--resume", "abc"], preserve_inherited=False)
+        assert argv == [sys.executable, str(script), "--resume", "abc"]
+
+    def test_shell_shim_is_executed_directly(self, monkeypatch, tmp_path):
+        shim = tmp_path / "hermes"
+        shim.write_text("#!/usr/bin/env bash\nexec /venv/bin/python /checkout/hermes \"$@\"\n")
+        shim.chmod(0o755)
+        monkeypatch.setattr(relaunch_mod, "resolve_hermes_bin", lambda: str(shim))
+        argv = relaunch_mod.build_relaunch_argv(["--resume", "abc"], preserve_inherited=False)
+        assert argv == [str(shim), "--resume", "abc"]
+
 
 class TestRelaunch:
     def test_calls_execvp(self, monkeypatch):

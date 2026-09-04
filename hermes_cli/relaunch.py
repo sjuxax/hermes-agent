@@ -121,6 +121,25 @@ def resolve_hermes_bin() -> Optional[str]:
     return None
 
 
+def _is_python_script(path: str) -> bool:
+    """True when ``path`` is a Python source launcher (python shebang).
+
+    Such a launcher must be relaunched with the *current* interpreter.
+    Executing it directly lets its shebang resolve ``python3`` on PATH, which
+    on a host whose system Python differs from the venv's relaunches Hermes
+    outside its venv.  This is the normal case for install.sh layouts: the
+    public ``hermes`` shim runs ``<checkout>/hermes`` (``#!/usr/bin/env
+    python3``) with the venv interpreter, so ``sys.argv[0]`` names that
+    script rather than the shim.
+    """
+    try:
+        with open(path, "rb") as fh:
+            first_line = fh.readline(256)
+    except OSError:
+        return False
+    return first_line.startswith(b"#!") and b"python" in first_line
+
+
 def build_relaunch_argv(
     extra_args: Sequence[str],
     *,
@@ -138,10 +157,12 @@ def build_relaunch_argv(
     """
     bin_path = resolve_hermes_bin()
 
-    if bin_path:
-        argv = [bin_path]
-    else:
+    if not bin_path:
         argv = [sys.executable, "-m", "hermes_cli.main"]
+    elif _is_python_script(bin_path):
+        argv = [sys.executable, bin_path]
+    else:
+        argv = [bin_path]
 
     src = list(original_argv) if original_argv is not None else list(sys.argv[1:])
 
