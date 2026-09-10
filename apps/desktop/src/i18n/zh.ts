@@ -446,8 +446,7 @@ export const zh: Translations = {
         '这是捆绑插件的桌面部分，但其 agent 部分未安装在当前连接的后端/配置上。请在 能力 → 插件 中安装。',
       agent: {
         title: 'Agent 插件',
-        movedToCapabilities:
-          'Agent 插件按配置在「能力」页管理 — 已安装列表、开关和插件目录都在那里。',
+        movedToCapabilities: 'Agent 插件按配置在「能力」页管理 — 已安装列表、开关和插件目录都在那里。',
         openCapabilities: '打开 能力 → 插件'
       },
       installModal: {
@@ -2601,6 +2600,7 @@ export const zh: Translations = {
     noSessions: '暂无会话',
     noFilterMatches: '没有会话符合这些筛选条件',
     projects: {
+      showAllSessions: '显示所有会话',
       sectionLabel: '项目',
       home: '主页',
       autoDiscovered: '自动发现',
@@ -3719,6 +3719,8 @@ export const zh: Translations = {
       errorRetry: '重试',
       errorStartNewSession: '开始新会话',
       errorSwitchProvider: '切换服务商',
+      errorSignInAgain: provider => `重新登录 ${provider}`,
+      errorOauthExpired: provider => `您的 ${provider} 登录已过期或被撤销。请重新登录以继续对话。`,
       errorOpenLogs: '打开日志',
       errorOpenLogsFailed: '无法打开日志文件夹',
       errorOpenDesktopLogs: '打开桌面端日志',
