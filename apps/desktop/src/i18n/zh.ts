@@ -242,6 +242,8 @@ export const zh = defineLocale({
       tryRecordingAgain: '请再录一次。',
       unavailable: '语音不可用',
       liveEnded: '实时语音会话已结束',
+      liveEndedConnectionLost: '实时语音会话连接已断开。',
+      liveEndedClosed: '实时语音会话已被服务端关闭。',
       liveError: '实时语音',
       liveDelegationFailed: '无法将请求交给 Hermes',
       liveUnavailable: reason => `GPT-Live 语音聊天不可用：${reason}。已改用语音转文字。`
@@ -687,7 +689,7 @@ export const zh = defineLocale({
       sessionDensityComfortable: '舒适',
       sessionDensityDetailed: '详细',
       tabStripTitle: '标签栏',
-      tabStripDesc: '在分区上方显示标签。自动模式会在分区只有一个面板时隐藏标签。',
+      tabStripDesc: '在分区上方显示标签。自动模式会在分区只有一个面板时隐藏标签，除非还开着其他聊天或磁贴分区。',
       tabStripAuto: '自动',
       tabStripAlways: '始终',
       tabStripNever: '从不',

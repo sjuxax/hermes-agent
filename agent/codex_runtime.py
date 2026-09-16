@@ -14,6 +14,7 @@ from types import SimpleNamespace
 from typing import Any, Callable, Dict, List
 
 from agent.stream_single_writer import claim_stream_writer, stream_writer_is_current
+from agent.transports.hermes_tools_mcp_server import HERMES_TOOLS_MCP_SERVER_NAME
 from agent.usage_anchor import set_usage_anchor
 
 logger = logging.getLogger(__name__)
@@ -77,7 +78,8 @@ def _queue_token_counts(agent, fail_msg: str, *fail_extra: Any, counts: Callable
     try:
         if not agent._session_db_created:
             agent._ensure_db_session()
-        agent._session_db.queue_token_counts(agent.session_id, **counts())
+        from agent.turn_usage import _agent_session_source
+        agent._session_db.queue_token_counts(agent.session_id, source=_agent_session_source(agent), **counts())
     except Exception as exc:
         logger.debug(fail_msg, agent.session_id, *fail_extra, exc)
 
@@ -194,7 +196,6 @@ def _record_codex_app_server_compaction(agent, turn, *, approx_tokens: int | Non
 _CODEX_TOOL_ITEM_TYPES = frozenset({"commandExecution", "fileChange", "mcpToolCall", "dynamicToolCall", "webSearch"})
 # Internal MCP server wrapping Hermes' native tools: its inner dispatch has no tool_progress_callback, so the
 # codex-level mcpToolCall IS the display event and the mcp.hermes-tools.* prefix is stripped (users see Hermes tools).
-_INTERNAL_MCP_SERVER = "hermes-tools"
 _STATIC_TOOL_NAMES = {"commandExecution": "exec_command", "fileChange": "apply_patch", "webSearch": "web_search"}
 _STABLE_ID_PREFIXES = {"commandExecution": "exec", "fileChange": "apply_patch"}
 _MCP_LIKE_ITEM_TYPES = {"mcpToolCall", "dynamicToolCall"}
@@ -211,7 +212,7 @@ def _codex_item_to_tool_name(item: dict) -> str:
     item_type = item.get("type") or ""
     if item_type == "mcpToolCall":
         server, tool = item.get("server") or "mcp", item.get("tool") or "unknown"
-        return tool if server == _INTERNAL_MCP_SERVER else f"mcp.{server}.{tool}"
+        return tool if server == HERMES_TOOLS_MCP_SERVER_NAME else f"mcp.{server}.{tool}"
     if item_type == "dynamicToolCall":
         return item.get("tool") or "dynamic"
     return _STATIC_TOOL_NAMES.get(item_type) or item_type or "unknown"
