@@ -8,9 +8,12 @@
 import type { ErrorCodeKey } from '@/lib/error-surface'
 import type { TipId } from '@/lib/tips/catalog'
 
+import type { AppTourTranslations, HandoffTourTranslations } from './types_app_tour'
 import type { AuxTaskCopyMap } from './types_aux_tasks'
 import type { BootTranslations } from './types_boot'
+import type { CatalogInstallTranslations } from './types_catalog_install'
 import type { ModelMenuTranslations } from './types_model_menu'
+import type { NoticeTranslations } from './types_notices'
 import type { SharedMetricsTranslations } from './types_shared_metrics'
 
 /** The locales compiled into the app (`TRANSLATIONS`). */
@@ -65,9 +68,10 @@ interface ModeOptionCopy {
   description: string
 }
 
-export interface Translations {
+export interface Translations extends NoticeTranslations {
   /** Shared-metrics consent: first-run dialog + Settings › Safety toggles. */
   sharedMetrics: SharedMetricsTranslations
+  appTour: AppTourTranslations
   externalOpenFailed: {
     title: string
     message: string
@@ -532,10 +536,6 @@ export interface Translations {
       backgroundFailedTitle: string
       creditsTitle: string
     }
-  }
-
-  remoteDisplayBanner: {
-    message: (reason: string) => string
   }
 
   billingBlock: {
@@ -3502,19 +3502,12 @@ export interface Translations {
     versionDetailsUncommittedChanges: string
   }
 
+  handoffTour: HandoffTourTranslations
   /** The guided first run's pre-written opening line — banked, not generated,
    *  so the first paint costs no model time. Translated per locale because the
    *  model is told to speak the user's language from its first real turn, and
    *  an English opener above a Japanese reply reads as two different agents.
    *  `nameSuggestion` offers the OS account name as a default. */
-  handoffTour: {
-    profileTitle: string
-    profileText: string
-    sessionsTitle: string
-    sessionsText: string
-    stayTitle: string
-    stayText: string
-  }
   guidedGreeting: {
     line: string
     nameSuggestion: (name: string) => string
@@ -4304,29 +4297,7 @@ export interface Translations {
       questionProgress: (answered: number, total: number) => string
       notDelivered: string
     }
-    catalogInstall: {
-      preparing: string
-      install: string
-      advanced: string
-      skip: string
-      installing: string
-      installed: string
-      notInstalled: string
-      failed: string
-      showNames: string
-      hideNames: string
-      skill: (name: string) => string
-      kind: { plugin: string; skill: string }
-      tier: { official: string; community: string }
-      targetProfile: (profile: string) => string
-      sendFailed: string
-      commitLabel: string
-      subdirLabel: string
-      securityHeading: string
-      scan: { passed: string; warnings: string; failed: string }
-      requirementsLabel: string
-      credentialsHeading: string
-    }
+    catalogInstall: CatalogInstallTranslations
     mcpSetup: {
       installTitle: string
       enableTitle: string
